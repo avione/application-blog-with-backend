@@ -1,0 +1,16 @@
+<li [ngClass]="{'list-group-item': true,
+              'list-group-item-success': post.loveIts > 0,
+              'list-group-item-danger': post.loveIts < 0 }">
+  <p [ngClass]="{'msfdate': true,
+                 'msfdate-love': post.loveIts > 0,
+                 'msfdate-dontlove': post.loveIts < 0 }">{{ post.created_at | date: 'dd/MM/yyyy HH:mm:ss'   }}</p>
+  <p [ngStyle]="{color: getColor()}">id:{{ post.id }}</p>
+  <h4 [ngStyle]="{color: getColor()}">{{ post.title }} </h4>
+  <p [ngStyle]="{color: getColor()}"> {{ post.content }}</p>
+  <img style="max-width:200px;" *ngIf="post.photo" [src]="post.photo">
+  <br>
+  <button class="btn btn-success px-3" (click)="onLoveIts()">Love it&nbsp;<i class="far fa-thumbs-up" aria-hidden="true"></i></button>
+  <button class="btn btn-danger" (click)="onDontLoveIts()">Don't Love it&nbsp;<i class="far fa-thumbs-down" aria-hidden="true"></i></button>
+  <span [ngStyle]="{color: getColor()}">{{ post.loveIts }}</span>
+  <button class="btn btn-primary pull-right" (click)="onDeletePost()" style="float: right;">Supprimer</button>
+</li>
