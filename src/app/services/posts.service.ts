@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { Post } from '../model/post';
 import { Subject } from 'rxjs';
 import * as firebase from 'firebase';
-import { resolve } from 'url';
 
 @Injectable({
   providedIn: 'root'
@@ -17,31 +16,26 @@ export class PostsService {
 
   postsSubject = new Subject<Post[]>();
 
-  postsfind = new Array<Post>();
-
   constructor() { }
 
   initPosts() {
-    if (this.getLastPostId() == 0 ) {
-      this.posts = new Array<Post>();
-      this.post = new Post(0,'Mon premier post', 'Administrator',
-        'créez un type pour les post, appelé Post, afin de rendre votre code plus lisible.  Vous pouvez même y intégrer un constructeur qui attribue automatiquement la date !', 1);
-      this.posts.push(this.post);
-      this.post = new Post(1,'Mon deuxième post', 'Administrator',
-        'créez un type pour les post, appelé Post, afin de rendre votre code plus lisible.  Vous pouvez même y intégrer un constructeur qui attribue automatiquement la date !',-1);
-      this.posts.push(this.post);
-      this.post = new Post(2,'Encore un post', 'Administrator',
-        'créez un type pour les post, appelé Post, afin de rendre votre code plus lisible.  Vous pouvez même y intégrer un constructeur qui attribue automatiquement la date !',0);
-      this.posts.push(this.post);
-      this.savePosts();
-      this.emitPosts();
-    }
-
+    //Initialisation du tableau avec les 3 premiers post
+    this.posts = new Array<Post>();
+    this.post = new Post(0, 'Mon premier post', 'Administrator',
+      'créez un type pour les post, appelé Post, afin de rendre votre code plus lisible.  Vous pouvez même y intégrer un constructeur qui attribue automatiquement la date !', 1);
+    this.posts.push(this.post);
+    this.post = new Post(1, 'Mon deuxième post', 'Administrator',
+      'créez un type pour les post, appelé Post, afin de rendre votre code plus lisible.  Vous pouvez même y intégrer un constructeur qui attribue automatiquement la date !', -1);
+    this.posts.push(this.post);
+    this.post = new Post(2, 'Encore un post', 'Administrator',
+      'créez un type pour les post, appelé Post, afin de rendre votre code plus lisible.  Vous pouvez même y intégrer un constructeur qui attribue automatiquement la date !', 0);
+    this.posts.push(this.post);
+    //on sauvegarde le tableau des posts
+    this.savePosts();
   }
   emitPosts() {
+    //Emission du tableau posts pour réactualiser le contenu du tableau posts
     this.postsSubject.next(this.posts);
-  //  this.postService.getPosts();
-
   }
   getLastPostId() {
     return this.posts.length;
@@ -49,58 +43,53 @@ export class PostsService {
   savePosts() {
     firebase.database().ref('/posts/').set(this.posts);
   }
-  findPosts(filter: string) {
-    firebase.database().ref('/posts')
-    .on('value', (data) => {
-      this.posts = data.val() ? data.val() : [];
-      this.postsfind = new Array<Post>();
-      this.posts.forEach((postEl:Post) => {
-          if((postEl.title.indexOf(filter)>0)||(postEl.content.indexOf(filter)>0)) {
-            this.postsfind.push(postEl);
-          }
-      });
-      if(this.postsfind.length>0) {
-        this.posts=this.postsfind;
-      }
-    this.emitPosts();
-    });
-    return this.postsfind.length;
-  }
   getPosts() {
+    //permet de récuperer le tableau des posts à partir de la base firebase
     firebase.database().ref('/posts')
       .on('value', (data) => {
         this.posts = data.val() ? data.val() : [];
+        //si le tableau des post est vide on l'initialise avec les 3 premiers posts et on le sauvegarde
+        if (this.posts.length == 0) this.initPosts();
+        //on emet ensuite le tableau des posts
         this.emitPosts();
       });
   }
   getSinglePost(id: number) {
+    //permet d'obtenir par la méthode promise un seul post grace à son id
     return new Promise(
-      (resolve,reject) => {
+      (resolve, reject) => {
         firebase.database().ref('/posts/' + id)
           .once('value').then((data) => {
-              resolve(data.val());
+            resolve(data.val());
           },
-          (error) => {
-            reject(error);
-          }
-        );
+            (error) => {
+              reject(error);
+            }
+          );
       }
     );
   }
   createNewPost(newpost: Post) {
+    //Ajout du post dans le tableau posts
     this.posts.push(newpost);
+    // sauvegarde du tableau posts
     this.savePosts();
+    //Emission du tableau posts pour réactualiser le contenu du tableau posts
     this.emitPosts();
   }
   savePost(post: Post) {
+    // récuperation de index du post
     post.id = this.getIdPost(post);
+    //Mise à jour du tableau posts avec le post
     this.posts[post.id] = post;
+    // sauvegarde du tableau posts
     this.savePosts();
+    //Emission du tableau posts pour réactualiser le contenu du tableau posts
     this.emitPosts();
   }
   removePost(post: Post) {
-    //retirer l'image si elle existe
-     if(post.photo) {
+    //retirer l'image si elle existe avant suppression du post
+    if (post.photo) {
       const storageRef = firebase.storage().refFromURL(post.photo);
       storageRef.delete().then(
         () => {
@@ -111,16 +100,19 @@ export class PostsService {
         }
       );
     }
-    //permet de supprimer le post de l'array posts
+    //Supprimer le post du tableau posts on va d'abord récupéré son id.
     post.id = this.getIdPost(post);
     this.posts.splice(post.id, 1);
+    // sauvegarde du tableau posts
     this.savePosts();
+    //Emission du tableau posts pour réactualiser le contenu du tableau posts
     this.emitPosts();
   }
   getIdPost(post: Post) {
+    //premet de trouver l'id du post
     const idPost = this.posts.findIndex(
       (postEl) => {
-        if(postEl === post) {
+        if (postEl === post) {
           return true;
         }
       }
@@ -129,6 +121,8 @@ export class PostsService {
   }
 
   uploadFile(file: File) {
+    // permet de uploder le fichier en renvoyant l'url du nom du fichier par le promise
+    // qui sera en suite socker dans la attribut photo du post
     return new Promise(
       (resolve, reject) => {
         const almostUniqueFileName = Date.now().toString();

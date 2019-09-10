@@ -25,6 +25,7 @@ export class NewPostComponent implements OnInit {
   }
 
   initForm() {
+    //initialisation du formulaire avec les champs obligatoires
     this.postForm = this.formBuilder.group({
       title: ['', Validators.required],
       author: ['', Validators.required],
@@ -33,20 +34,25 @@ export class NewPostComponent implements OnInit {
   }
 
   onSavePost() {
+    //Sauvegarde du post, on récupère les valeurs du formulaire
     const id = this.postsService.getLastPostId();
     const title = this.postForm.get('title').value;
     const author = this.postForm.get('author').value;
     const content = this.postForm.get('content').value;
     const newPost = new Post(id, title, author, content, 0);
 
+    //On vérifie si une image a été uploader
     if(this.fileUrl && this.fileUrl !== '') {
       newPost.photo = this.fileUrl;
     }
+    //On sauvegarde le post et on l'ajoute à la liste des posts
     this.postsService.createNewPost(newPost);
+    //On route l'utilisateur sur la liste des posts
     this.router.navigate(['/posts']);
   }
 
   detectFiles(event) {
+    //Détection de l'évenement pour le upload du fichier
     this.onUploadFile(event.target.files[0]);
   }
   onUploadFile(file: File) {

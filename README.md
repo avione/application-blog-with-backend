@@ -1,26 +1,16 @@
 # Application-blog-with-backend
-
-# Utilisation d'Angular 8, Material Design for Bootstrap 
+* Application-blog angular 8 with backend Firebase
+# Utilisation d'Angular 8, Material Design for Bootstrap et Firebase
 
 * Cette petite application montre l'utilisation des différents types de databinding et le passage de propriétés paramètres et variables d'un component à un autre.
 
 * Dans cet exemple : 
 - J'ai utilisé les directives structurelles *ngFor, ngStyle et ngClass dans les fichiers template html des components  PostListComponent,  PostListItemComponent. 
-
-- Dans le component AppComponent j'ai créé un tableau de post que j'ai passé en paramètre dans le template html de  la manière suivante:
-<app-post-list [posts]="posts"></app-post-list>
-- Que j'ai récupéré ensuite dans le component PostListComponent avec la ligne de commande suivante:
-@Input()  posts: Post[];
-
-- J'ai passé ensuite tous les posts du tableau du component PostListComponent par le template html au component PostListItemComponent  en utilisant la directive *ngFor de la manière suivante:
-<app-post-list-item  *ngFor="let post of posts" 
-  [post]="post"
-  ></app-post-list-item> 
-- Que j'ai récupéré dans PostListItemComponent avec la ligne de commande suivante:
- @Input()  post: Post; 
- (La class modèle Post contient les éléments title, content, create_at, loveits)   
- 
-- J'ai créé les fonctions   getColor() pour l'associer aux directives [ngStyle], onloveIts() et onDontLoveIts() pour les associer au événement (click), ainsi que le pipe pour le format de l'affichage de la date.
+- Création d'un service qui stocke l'array des posts et  les publies sous forme de Subject — le service permet également l'ajout d'un nouveau post et la suppression d'un post existant.
+- intégrration d'un bouton "Supprimer" sur chaque PostListItemComponent.
+- Création d'un nouveau component, NewPostComponent, qui comporte un formulaire (méthode réactive) qui permet à l'utilisateur d'entrer le titre, l'auteur et le contenu d'un nouveau post, ainsi que l'ajout d'une image. Ce nouveau post sera ensuite créé et ajouté par le service PostService à l'array posts et enregistrer dans la base firebase, et l'utilisateur sera redirigé vers la liste des posts.
+- Intégration d'un menu de navigation en haut (avec le routing correspondant par le biais de Material Design), permet de naviguer vers la liste des posts (/posts) et vers le formulaire (/new) (le path vide sera redirigé vers le path /posts) — le lien du menu correspondant à la route active comportera la classe active.
+- Chaque click sur sur les boutons loveIts et DontloveIts augmente ou diminue le nombre de loveIts et est enregistré dans la base FireBase par le service PostService.
 
 
 # Utilisation de LOCALE_ID: 
@@ -51,6 +41,24 @@ this.create_at = new Date();
 
 - Positionnez-vous ensuite dans le répertoire test et exécuter la commande : 
 #		npm install
+
+# Pour firebase :
+- Créer un fichier credentiels.ts dans le répertoire app.
+- Vous devez aller en suite sur le site http://firebase.google.com 
+- Vous vous connectez avec votre compte google et accéder en suite à la console.
+- Créer un nouveau projet, récupérer les clés de config firebase et l'ajouter dans le fichier credentiels.ts dans le répertoire app.
+
+Voici un exemple fictif de clés du contenu du fichier credentiels.ts:
+- export var firebaseConfig = {
+-    apiKey: "AIzaYyBlAsLPyKJ0z2ckhy2Vxtt_D9ThpHN5FWE",
+-    authDomain: "app-blog-3a974.firebaseapp.com",
+-    databaseURL: "https://app-blog-3a974.firebaseio.com",
+-    projectId: "app-blog-3a974",
+-    storageBucket: "app-blog-3a974.appspot.com",
+-    messagingSenderId: "21310261064",
+-    appId: "1:21310261064:web:76e97c8b65d50748"
+- }
+
 - Une fois que c'est terminé éxecuter la commande : 
 #		ng serve
 - Ouvrez votre browser avec l'url:

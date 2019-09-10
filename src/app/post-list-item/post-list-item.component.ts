@@ -11,6 +11,7 @@ export class PostListItemComponent implements OnInit {
 
 // databinding: Récéption du model post
  @Input() post: Post;
+ @Input() id: number;
 
   constructor(private postsService: PostsService) {
   }
@@ -40,6 +41,7 @@ export class PostListItemComponent implements OnInit {
     this.postsService.savePost(this.post);
     this.postsService.emitPosts();
   }
+  // Suppression du post
   onDeletePost() {
     this.postsService.removePost(this.post);
     this.postsService.emitPosts();

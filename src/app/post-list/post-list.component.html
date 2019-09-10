@@ -2,7 +2,7 @@
   <div class="col-sm-12 col-sm-offset-2">
     <h3 class="fontweight"><BR>Liste des Posts</h3>
     <ul class="list-group">
-      <app-post-list-item *ngFor="let post of posts" [post]="post"></app-post-list-item>
+      <app-post-list-item *ngFor="let post of posts; let id=index;" [post]="post" [id]="id"></app-post-list-item>
     </ul>
   </div>
 </div>

@@ -1,10 +1,12 @@
+import { formatDate } from '@angular/common';
+//Class du modèle Post
 export class Post {
   id: number;
   title: string;
   author: string;
 	content: string;
 	loveIts: number;
-  created_at: Date;
+  created_at: string;
   photo: string;
 
 	constructor(id: number, title: string, author: string, content: string, loveIts: number) {
@@ -13,6 +15,6 @@ export class Post {
     this.author=author;
 		this.content=content;
 		this.loveIts=loveIts;
-		this.created_at=new Date();
+		this.created_at=formatDate( new Date(),'dd/MM/yyyy HH:mm:ss', 'fr-FR')
 	}
 }
